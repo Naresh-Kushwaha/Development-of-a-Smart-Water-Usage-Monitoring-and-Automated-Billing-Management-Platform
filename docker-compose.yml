@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: smartwater
+      POSTGRES_USER: smartwater
+      POSTGRES_PASSWORD: smartwater
+    volumes: [pgdata:/var/lib/postgresql/data]
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartwater"]
+      interval: 5s
+      retries: 10
+
+  mailhog:                      # catches all outgoing email; inbox UI at http://localhost:8025
+    image: mailhog/mailhog
+    ports: ["1025:1025", "8025:8025"]
+
+  backend:
+    build: ./backend
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/smartwater
+      DB_USER: smartwater
+      DB_PASSWORD: smartwater
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      JWT_SECRET: ${JWT_SECRET:-change-me-please-use-a-long-random-secret-of-32+bytes}
+      SEED_DEMO: ${SEED_DEMO:-true}
+    ports: ["8080:8080"]
+
+  frontend:
+    build: ./frontend
+    depends_on: [backend]
+    ports: ["3000:80"]
+
+volumes:
+  pgdata:
