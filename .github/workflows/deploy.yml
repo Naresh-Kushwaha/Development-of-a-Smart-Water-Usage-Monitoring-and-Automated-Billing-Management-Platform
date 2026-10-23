@@ -88,10 +88,10 @@ jobs:
               "SEED_DEMO=false" > .env
 
             # Pull the latest application images
-            docker compose pull backend frontend
+            sudo docker compose pull backend frontend
 
             # Start or update the application
-            docker compose up -d --remove-orphans
+            sudo docker compose up -d --remove-orphans
 
             # Display the status of all services
-            docker compose ps
+            sudo docker compose ps
