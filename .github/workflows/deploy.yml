@@ -1,11 +1,8 @@
 
-name: CI/CD - React and Spring Boot
+name: SmartWater CI/CD
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
     branches:
       - main
   workflow_dispatch:
@@ -13,77 +10,16 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: production-deployment
-  cancel-in-progress: false
-
-env:
-  BACKEND_IMAGE: nareshkushwaha/backend-smart-water-platform:latest
-  FRONTEND_IMAGE: nareshkushwaha/frontend-smart-water-platform:latest
-
 jobs:
-  test:
-    name: Test and Validate
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Set up Java 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
-
-      - name: Test Spring Boot backend
-        working-directory: backend
-        run: mvn -B clean verify
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: Install frontend dependencies
-        working-directory: frontend
-        run: npm ci
-
-      - name: Build React frontend
-        working-directory: frontend
-        run: npm run build
-
-      
-      - name: Validate Docker Compose
-        run: |
-          cat > .env.ci <<'EOF'
-          IMAGE_TAG=latest
-          DB_NAME=smartwater
-          DB_USER=smartwater
-          DB_PASSWORD=ci-password
-          JWT_SECRET=ci-only-placeholder-secret-for-testing
-          SEED_DEMO=false
-          CORS_ORIGINS=http://localhost:3000
-          EOF
-
-          docker compose -f ./docker-compose.yml --env-file .env.ci config --quiet
-          status=$?
-          rm -f .env.ci
-          exit $status
-
-
-  publish:
-    name: Build and Push Docker Images
-    runs-on: ubuntu-latest
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - name: Checkout source
-        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -91,86 +27,70 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and push backend image
+      - name: Build and push backend
         uses: docker/build-push-action@v6
         with:
           context: ./backend
-          file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
-            ${{ env.BACKEND_IMAGE }}:latest
-          cache-from: type=gha,scope=backend
-          cache-to: type=gha,mode=max,scope=backend
+            ${{ secrets.DOCKERHUB_USERNAME }}/smartwater-backend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/smartwater-backend:${{ github.sha }}
 
-      - name: Build and push frontend image
+      - name: Build and push frontend
         uses: docker/build-push-action@v6
         with:
           context: ./frontend
-          file: ./frontend/Dockerfile
           push: true
           tags: |
-           ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
-           ${{ env.FRONTEND_IMAGE }}:latest
-          cache-from: type=gha,scope=frontend
-          cache-to: type=gha,mode=max,scope=frontend
+            ${{ secrets.DOCKERHUB_USERNAME }}/smartwater-frontend:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/smartwater-frontend:${{ github.sha }}
 
   deploy:
-    name: Deploy to Ubuntu EC2
+    needs: build-and-push
     runs-on: ubuntu-latest
-    needs: publish
-    environment: production
 
     steps:
-      - name: Checkout source
+      - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Copy Compose file to EC2
+      - name: Copy Docker Compose file to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           source: docker-compose.yml
-          target: /opt/your-project/
+          target: /opt/smartwater
 
-      - name: Deploy application
+      - name: Deploy on EC2
         uses: appleboy/ssh-action@v1.2.2
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
         with:
           host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
+          username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: IMAGE_TAG
+          envs: DOCKERHUB_USERNAME,DB_PASSWORD,JWT_SECRET,CORS_ORIGINS
           script: |
             set -eu
+            cd /opt/smartwater
 
-            cd /opt/your-project
+            umask 077
+            printf '%s\n' \
+              "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" \
+              "DB_PASSWORD=$DB_PASSWORD" \
+              "JWT_SECRET=$JWT_SECRET" \
+              "CORS_ORIGINS=$CORS_ORIGINS" \
+              "SEED_DEMO=false" > .env
 
-            echo "Deploying version: $IMAGE_TAG"
+            # Pull the latest application images
+            docker compose pull backend frontend
 
-            sudo IMAGE_TAG="$IMAGE_TAG" \
-              docker compose pull frontend backend
+            # Start or update the application
+            docker compose up -d --remove-orphans
 
-            sudo IMAGE_TAG="$IMAGE_TAG" \
-              docker compose up -d --remove-orphans
-
-            sudo docker compose ps
-
-            for attempt in $(seq 1 12); do
-              if curl -fsS http://127.0.0.1/ >/dev/null; then
-                echo "Frontend is responding."
-                exit 0
-              fi
-
-              echo "Waiting for frontend..."
-              sleep 5
-            done
-
-            echo "Frontend did not become available."
-            sudo docker compose logs --tail=100 frontend backend
-            exit 1
+            # Display the status of all services
+            docker compose ps
