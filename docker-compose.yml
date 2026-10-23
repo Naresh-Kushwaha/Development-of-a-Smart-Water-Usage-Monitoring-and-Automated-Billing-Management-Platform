@@ -1,41 +1,152 @@
-services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: smartwater
-      POSTGRES_USER: smartwater
-      POSTGRES_PASSWORD: smartwater
-    volumes: [pgdata:/var/lib/postgresql/data]
-    ports: ["5432:5432"]
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U smartwater"]
-      interval: 5s
-      retries: 10
 
-  mailhog:                      # catches all outgoing email; inbox UI at http://localhost:8025
-    image: mailhog/mailhog
-    ports: ["1025:1025", "8025:8025"]
+name: Smart Water Platform CI/CD
 
-  backend:
-    build: ./backend
-    depends_on:
-      db: { condition: service_healthy }
-    environment:
-      DB_URL: jdbc:postgresql://db:5432/smartwater
-      DB_USER: smartwater
-      DB_PASSWORD: smartwater
-      MAIL_HOST: mailhog
-      MAIL_PORT: 1025
-      JWT_SECRET: ${JWT_SECRET:-change-me-please-use-a-long-random-secret-of-32+bytes}
-      SEED_DEMO: ${SEED_DEMO:-true}
-      CORS_ORIGINS: ${CORS_ORIGINS}
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
-    ports: ["8080:8080"]
+permissions:
+  contents: read
 
-  frontend:
-    build: ./frontend
-    depends_on: [backend]
-    ports: ["3000:80"]
+concurrency:
+  group: smartwater-production
+  cancel-in-progress: false
 
-volumes:
-  pgdata:
+jobs:
+  test:
+    name: Test frontend and backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Test Spring Boot backend
+        working-directory: backend
+        run: mvn -B clean verify
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build React frontend
+        working-directory: frontend
+        run: npm run build
+
+  publish:
+    name: Publish Docker images
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and publish backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            nareshkushwaha/backend-smart-water-platform:${{ github.sha }}
+            nareshkushwaha/backend-smart-water-platform:latest
+          cache-from: type=gha,scope=smartwater-backend
+          cache-to: type=gha,mode=max,scope=smartwater-backend
+
+      - name: Build and publish frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            nareshkushwaha/frontend-smart-water-platform:${{ github.sha }}
+            nareshkushwaha/frontend-smart-water-platform:latest
+          cache-from: type=gha,scope=smartwater-frontend
+          cache-to: type=gha,mode=max,scope=smartwater-frontend
+
+  deploy:
+    name: Deploy to EC2
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy Docker Compose file to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: docker-compose.yml
+          target: /opt/smartwater/
+
+      - name: Deploy containers
+        uses: appleboy/ssh-action@v1.2.2
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          envs: IMAGE_TAG
+          script: |
+            set -eu
+            cd /opt/smartwater
+
+            echo "Deploying Smart Water Platform: $IMAGE_TAG"
+
+            sudo env IMAGE_TAG="$IMAGE_TAG" \
+              docker compose pull backend frontend
+
+            sudo env IMAGE_TAG="$IMAGE_TAG" \
+              docker compose up -d --remove-orphans
+
+            sudo docker compose ps
+
+            for attempt in $(seq 1 12); do
+              if curl -fsS http://127.0.0.1:3000/ >/dev/null; then
+                echo "Frontend is responding."
+                exit 0
+              fi
+
+              echo "Waiting for frontend..."
+              sleep 5
+            done
+
+            echo "Frontend health check failed."
+            sudo docker compose logs --tail=100 frontend backend
+            exit 1
