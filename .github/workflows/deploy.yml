@@ -56,19 +56,24 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      
       - name: Validate Docker Compose
         run: |
           cat > .env.ci <<'EOF'
-          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG=latest
-          DB_NAME=ci_database
-          DB_USERNAME=ci_user
+          DB_NAME=smartwater
+          DB_USER=smartwater
           DB_PASSWORD=ci-password
-          JWT_SECRET=ci-only-placeholder-secret
+          JWT_SECRET=ci-only-placeholder-secret-for-testing
+          SEED_DEMO=false
+          CORS_ORIGINS=http://localhost:3000
           EOF
 
-          docker compose --env-file .env.ci config --quiet
+          docker compose -f ./docker-compose.yml --env-file .env.ci config --quiet
+          status=$?
           rm -f .env.ci
+          exit $status
+
 
   publish:
     name: Build and Push Docker Images
@@ -96,8 +101,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.BACKEND_IMAGE }}:latest
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
@@ -108,8 +113,8 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.FRONTEND_IMAGE }}:latest
+           ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}
+           ${{ env.FRONTEND_IMAGE }}:latest
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
