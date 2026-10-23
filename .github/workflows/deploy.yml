@@ -59,7 +59,7 @@ jobs:
       - name: Validate Docker Compose
         run: |
           cat > .env.ci <<'EOF'
-          DOCKERHUB_USERNAME=ci-user
+          DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
           IMAGE_TAG=latest
           DB_NAME=ci_database
           DB_USERNAME=ci_user
