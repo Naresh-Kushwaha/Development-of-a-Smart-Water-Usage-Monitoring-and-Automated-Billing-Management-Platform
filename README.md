@@ -1,5 +1,5 @@
 # AquaTrack - Smart Water Usage Monitoring & Automated Billing Platform
-
+Live: https://smartwater-frontend.onrender.com
 Full-stack apartment water platform: **Spring Boot 3 (Java 17) + PostgreSQL + React 18 (Vite, Recharts)**.
 
 | Module (project brief) | Where it lives |
