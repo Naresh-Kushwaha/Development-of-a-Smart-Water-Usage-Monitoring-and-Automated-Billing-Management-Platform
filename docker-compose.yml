@@ -18,3 +18,5 @@ services:
     image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
     depends_on: [backend]
     ports: ["3000:80"]
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
