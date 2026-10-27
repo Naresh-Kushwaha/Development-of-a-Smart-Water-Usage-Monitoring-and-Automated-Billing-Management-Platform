@@ -3,9 +3,9 @@ server:
 spring:
   application.name: smart-water-platform
   datasource:
-    url: ${DB_URL:jdbc:postgresql://database-1.chisiqqwomro.ap-south-1.rds.amazonaws.com:5432/smartwater}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/smartwater}
     username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:postgres}
+    password: ${DB_PASSWORD:admin}
   jpa:
     hibernate.ddl-auto: none
     open-in-view: false
@@ -14,22 +14,22 @@ spring:
   servlet:
     multipart.max-file-size: 5MB
   mail:
-    host: ${MAIL_HOST:localhost}
-    port: ${MAIL_PORT:1025}
-    username: ${MAIL_USER:}
-    password: ${MAIL_PASSWORD:}
-    properties.mail.smtp.auth: ${MAIL_AUTH:false}
-    properties.mail.smtp.starttls.enable: ${MAIL_TLS:false}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
+    properties.mail.smtp.auth: ${MAIL_AUTH:true}
+    properties.mail.smtp.starttls.enable: ${MAIL_TLS:true}
     properties.mail.smtp.connectiontimeout: 3000
     properties.mail.smtp.timeout: 3000
 app:
   jwt:
-    secret: ${JWT_SECRET:change-me-please-use-a-long-random-secret-of-32+bytes}
+    secret: ${JWT_SECRET:5gkgwatOMD7OO8-pOTGU3IRPREHH8urijpR2R6hS6Tinh2oE00T0-LFu1D0FU2xw}
     expiration-minutes: 720
   cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
   mail:
     enabled: ${MAIL_ENABLED:true}
-    from: ${MAIL_FROM:no-reply@smartwater.local}
+    from: ${MAIL_USER:nn9619807@gmail.com}
   alerts.cron: ${ALERT_CRON:0 0 7 * * *}
   seed-demo: ${SEED_DEMO:true}
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import api, { errMsg } from '../api.js';
@@ -30,6 +29,24 @@ const FEATURES = [
   },
 ];
 
+const WATER_TIPS = [
+  {
+    icon: '⌁',
+    title: 'Fix leaks early',
+    description: 'A small drip can waste water over time.',
+  },
+  {
+    icon: '◉',
+    title: 'Use water wisely',
+    description: 'Turn off the tap while brushing your teeth.',
+  },
+  {
+    icon: '◷',
+    title: 'Take shorter showers',
+    description: 'A few minutes less can make a difference.',
+  },
+];
+
 export default function Auth() {
   const { user, login } = useAuth();
   const nav = useNavigate();
@@ -44,10 +61,7 @@ export default function Auth() {
 
   const set = (key) => (e) => {
     const value =
-      key === 'apartmentCode'
-        ? e.target.value.toUpperCase()
-        : e.target.value;
-
+      key === 'apartmentCode' ? e.target.value.toUpperCase() : e.target.value;
     setF((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -82,55 +96,37 @@ export default function Auth() {
 
   return (
     <main className="aqua-auth">
-      <div className="auth-shell">
-        {/* Left branding panel */}
-        <section className="auth-showcase">
-          <div className="showcase-glow showcase-glow-one" />
-          <div className="showcase-glow showcase-glow-two" />
+      <header className="site-header">
+        <a className="aqua-brand" href="/" aria-label="AquaTrack home">
+          <span className="brand-icon" aria-hidden="true">💧</span>
+          <span>AquaTrack<span className="brand-dot">.</span></span>
+        </a>
+        <div className="header-message">
+          Smarter water <span>•</span> Fairer bills <span>•</span> Greener tomorrow
+        </div>
+      </header>
 
-          <a className="aqua-brand" href="/" aria-label="AquaTrack home">
-            <span className="brand-icon">
-              <svg
-                viewBox="0 0 40 40"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M20 4C15 12 8 19 8 25a12 12 0 0 0 24 0C32 19 25 12 20 4Z"
-                  fill="currentColor"
-                />
-                <path
-                  d="M14 26c.5 3.2 2.5 5 5.5 5.5"
-                  stroke="#087E8B"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </span>
-            <span>AquaTrack<span className="brand-dot">.</span></span>
-          </a>
-
-          <div className="showcase-content">
+      <div className="auth-layout">
+        <section className="auth-showcase" aria-label="AquaTrack benefits">
+          <div className="hero-copy">
             <span className="eyebrow">
               <span className="status-dot" />
               SMARTER WATER MANAGEMENT
             </span>
-
             <h1>
               Every drop
               <br />
               <span>counts.</span>
             </h1>
-
             <p className="showcase-description">
-              A smarter way to track water, manage apartment
-              expenses, and build a more sustainable community.
+              Track water usage, manage shared expenses, and build a more
+              sustainable community — one drop at a time.
             </p>
 
             <div className="feature-list">
               {FEATURES.map((feature) => (
                 <div className="feature-item" key={feature.title}>
-                  <div className="feature-icon">{feature.icon}</div>
+                  <div className="feature-icon" aria-hidden="true">{feature.icon}</div>
                   <div>
                     <h3>{feature.title}</h3>
                     <p>{feature.description}</p>
@@ -140,60 +136,71 @@ export default function Auth() {
             </div>
           </div>
 
-          <div className="showcase-footer">
-            <div className="footer-watermark">AQUATRACK / 01</div>
-            <p>Better insights. Fairer bills. A greener tomorrow.</p>
-          </div>
-
-          {/* Decorative water illustration */}
-          <div className="water-art" aria-hidden="true">
-            <div className="water-ring water-ring-one" />
-            <div className="water-ring water-ring-two" />
-            <div className="water-orb">
-              <svg viewBox="0 0 120 120" fill="none">
-                <path
-                  d="M60 13C47 35 27 53 27 73a33 33 0 0 0 66 0C93 53 73 35 60 13Z"
-                  fill="url(#waterGradient)"
-                />
-                <path
-                  d="M43 75c1 9 7 15 17 17"
-                  stroke="#FFFFFF"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                />
-                <defs>
-                  <linearGradient
-                    id="waterGradient"
-                    x1="30"
-                    y1="20"
-                    x2="90"
-                    y2="100"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#9BF6F0" />
-                    <stop offset="1" stopColor="#13B8C5" />
-                  </linearGradient>
-                </defs>
-              </svg>
+          <div className="hero-visual">
+            <img
+              className="water-banner"
+              src="/images/water-saving-banner.png"
+              alt="Fresh water, green leaves and a calm sustainable community"
+            />
+            <div className="visual-shade" />
+            <div className="usage-card usage-card-top">
+              <span className="mini-icon">💧</span>
+              <div>
+                <p>Make every drop count</p>
+                <strong>Use water mindfully</strong>
+                <small>Small habits create lasting change</small>
+              </div>
+            </div>
+            <div className="usage-card usage-card-bottom">
+              <span className="mini-icon green">🌿</span>
+              <div>
+                <p>Water-saving reminder</p>
+                <strong>Check for leaks regularly</strong>
+                <small>Protect water and your budget</small>
+              </div>
             </div>
           </div>
+
+          <section className="tips-card" aria-labelledby="tips-title">
+            <div className="tips-heading">
+              <span className="tips-bulb" aria-hidden="true">✦</span>
+              <div>
+                <span className="section-kicker">WATER-SAVING TIPS</span>
+                <h2 id="tips-title">Small changes. Real impact.</h2>
+                <p>Simple habits can help reduce waste at home.</p>
+              </div>
+            </div>
+            <div className="tips-list">
+              {WATER_TIPS.map((tip) => (
+                <article className="tip-item" key={tip.title}>
+                  <span className="tip-icon" aria-hidden="true">{tip.icon}</span>
+                  <div>
+                    <h3>{tip.title}</h3>
+                    <p>{tip.description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <div className="impact-row">
+            <div><span>💧</span><p><strong>Less waste</strong><small>Protect a shared resource</small></p></div>
+            <div><span>⌂</span><p><strong>Clearer bills</strong><small>Understand your usage</small></p></div>
+            <div><span>🌱</span><p><strong>Greener living</strong><small>Build better habits</small></p></div>
+          </div>
+          <p className="showcase-footer">Better insights. Fairer bills. A greener tomorrow.</p>
         </section>
 
-        {/* Right authentication panel */}
-        <section className="auth-panel">
+        <section className="auth-panel" aria-label="Account access">
           <div className="mobile-brand">
-            <span className="mobile-brand-icon">💧</span>
-            AquaTrack<span>.</span>
+            <span aria-hidden="true">💧</span> AquaTrack<span className="brand-dot">.</span>
           </div>
 
           <div className="auth-card">
             <div className="auth-heading">
               <span className="form-kicker">
-                {mode === 'login'
-                  ? 'WELCOME BACK'
-                  : 'GET STARTED'}
+                {mode === 'login' ? 'WELCOME BACK' : 'GET STARTED'}
               </span>
-
               <h2>
                 {mode === 'login'
                   ? 'Welcome back'
@@ -201,7 +208,6 @@ export default function Auth() {
                     ? 'Join your community'
                     : 'Set up your apartment'}
               </h2>
-
               <p>
                 {mode === 'login'
                   ? 'Sign in to keep track of every drop.'
@@ -252,7 +258,6 @@ export default function Auth() {
                       onChange={set('apartmentName')}
                     />
                   </Field>
-
                   <Field label="Address (optional)">
                     <input
                       name="address"
@@ -267,10 +272,7 @@ export default function Auth() {
 
               {mode === 'resident' && (
                 <>
-                  <Field
-                    label="Apartment code"
-                    hint="Ask your apartment administrator for this code."
-                  >
+                  <Field label="Apartment code" hint="Ask your apartment administrator for this code.">
                     <input
                       name="apartmentCode"
                       placeholder="e.g. GREEN2026"
@@ -280,11 +282,7 @@ export default function Auth() {
                       onChange={set('apartmentCode')}
                     />
                   </Field>
-
-                  <Field
-                    label="Unit number"
-                    hint="Use the unit registered by your administrator."
-                  >
+                  <Field label="Unit number" hint="Use the unit registered by your administrator.">
                     <input
                       name="unitNumber"
                       placeholder="e.g. A-101"
@@ -308,90 +306,57 @@ export default function Auth() {
                 />
               </Field>
 
-              <Field
-                label="Password"
-                hint={
-                  mode === 'login'
-                    ? ''
-                    : 'Use at least 8 characters.'
-                }
-              >
+              <Field label="Password" hint={mode === 'login' ? '' : 'Use at least 8 characters.'}>
                 <div className="password-wrap">
                   <input
                     name="password"
                     type={showPassword ? 'text' : 'password'}
-                    placeholder={
-                      mode === 'login'
-                        ? 'Enter your password'
-                        : 'Create a strong password'
-                    }
-                    autoComplete={
-                      mode === 'login'
-                        ? 'current-password'
-                        : 'new-password'
-                    }
+                    placeholder={mode === 'login' ? 'Enter your password' : 'Create a strong password'}
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
                     minLength={mode === 'login' ? 1 : 8}
                     value={f.password || ''}
                     required
                     onChange={set('password')}
                   />
-
                   <button
                     type="button"
                     className="password-toggle"
                     onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={
-                      showPassword ? 'Hide password' : 'Show password'
-                    }
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
               </Field>
 
-              <div className="auth-error" aria-live="polite">
-                <Msg>{err}</Msg>
-              </div>
+              <div className="auth-error" aria-live="polite"><Msg>{err}</Msg></div>
 
-              <button
-                className="auth-submit"
-                type="submit"
-                disabled={busy}
-              >
+              <button className="auth-submit" type="submit" disabled={busy}>
                 {busy ? (
-                  <>
-                    <span className="auth-spinner" />
-                    Please wait...
-                  </>
+                  <><span className="auth-spinner" /> Please wait...</>
                 ) : (
-                  <>
-                    {MODES[mode]}
-                    <span className="submit-arrow">→</span>
-                  </>
+                  <>{MODES[mode]} <span className="submit-arrow">→</span></>
                 )}
               </button>
             </form>
 
             {mode === 'login' && (
               <div className="demo-box">
-                <div className="demo-icon">i</div>
+                <div className="demo-icon" aria-hidden="true">i</div>
                 <div>
-                  <strong>Try the demo</strong>
+                  <strong>Trying the demo?</strong>
                   <p>Admin: admin@demo.com</p>
                   <p>Resident: resident1@demo.com</p>
-                  <small>
-                    Demo passwords are configured by your application.
-                  </small>
+                  <small>Demo passwords are configured by your application.</small>
                 </div>
               </div>
             )}
 
             <div className="auth-security">
-              <span>◇</span>
+              <span aria-hidden="true">◇</span>
               Your apartment data stays protected by your sign-in.
             </div>
           </div>
-
           <p className="panel-copyright">
             © {new Date().getFullYear()} AquaTrack · Smarter living starts here.
           </p>

@@ -39,7 +39,10 @@ public class AlertService {
     @Scheduled(cron = "${app.alerts.cron}")
     public void scheduledRun() {
         for (Apartment a : apartments.findAll()) {
-            try { Report r = check(a.getId()); log.info("Alert run for {}: {}", a.getName(), r); }
+            try { 
+                Report r = check(a.getId());
+                log.info("Alert run for {}: {}", a.getName(), r); 
+            }
             catch (Exception e) { log.error("Alert run failed for apartment {}", a.getId(), e); }
         }
     }
