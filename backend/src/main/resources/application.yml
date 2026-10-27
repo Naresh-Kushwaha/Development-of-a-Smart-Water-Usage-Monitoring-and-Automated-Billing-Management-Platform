@@ -20,8 +20,8 @@ spring:
     password: ${MAIL_PASSWORD}
     properties.mail.smtp.auth: ${MAIL_AUTH:true}
     properties.mail.smtp.starttls.enable: ${MAIL_TLS:true}
-    properties.mail.smtp.connectiontimeout: 3000
-    properties.mail.smtp.timeout: 3000
+    properties.mail.smtp.connectiontimeout: 10000
+    properties.mail.smtp.timeout: 10000
 app:
   jwt:
     secret: ${JWT_SECRET:5gkgwatOMD7OO8-pOTGU3IRPREHH8urijpR2R6hS6Tinh2oE00T0-LFu1D0FU2xw}
