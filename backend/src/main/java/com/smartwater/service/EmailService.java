@@ -81,7 +81,7 @@ public class EmailService {
             sender.send(message);
             log.info("Water usage alert submitted for delivery");
         } catch (MailException ex) {
-            log.error("Failed to submit water usage alert");
+            log.error("Failed to submit water usage alert: {}", ex.getMessage());
             throw ex;
         }
     }

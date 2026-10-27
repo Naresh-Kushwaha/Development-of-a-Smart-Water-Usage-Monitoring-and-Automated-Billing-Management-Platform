@@ -29,7 +29,7 @@ app:
   cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
   mail:
     enabled: ${MAIL_ENABLED:true}
-    from: ${MAIL_USER:nn9619807@gmail.com}
+    from: ${MAIL_USER}
   alerts.cron: ${ALERT_CRON:0 0 7 * * *}
   seed-demo: ${SEED_DEMO:true}
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}
