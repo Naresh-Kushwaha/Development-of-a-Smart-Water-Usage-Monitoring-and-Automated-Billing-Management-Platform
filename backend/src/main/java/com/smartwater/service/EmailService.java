@@ -1,6 +1,5 @@
-package com.smartwater.service;
 
-import lombok.extern.slf4j.Slf4j;
+package com.smartwater.service;
 
 import java.nio.charset.StandardCharsets;
 
@@ -14,61 +13,75 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
 public class EmailService {
+
     private final JavaMailSender sender;
     private final boolean enabled;
     private final String from;
-   private final SpringTemplateEngine templateEngine;
-    public EmailService(JavaMailSender sender, @Value("${app.mail.enabled}") boolean enabled,
-                        @Value("${app.mail.from}") String from) {
-        this.sender = sender; this.enabled = enabled; this.from = from;
-        this.templateEngine = new SpringTemplateEngine();
+    private final SpringTemplateEngine templateEngine;
+
+    // Inject Spring's configured template engine
+    public EmailService(
+            JavaMailSender sender,
+            SpringTemplateEngine templateEngine,
+            @Value("${app.mail.enabled:true}") boolean enabled,
+            @Value("${app.mail.from}") String from) {
+
+        this.sender = sender;
+        this.templateEngine = templateEngine;
+        this.enabled = enabled;
+        this.from = from;
     }
 
-   
-public void send(String to, String subject, String body) {
+    public void send(String to, String subject, String body) {
 
-    if (!enabled) {
-        log.info("[mail disabled] to={} subject={}", to, subject);
-        return;
+        if (!enabled) {
+            log.info("[mail disabled] to={} subject={}", to, subject);
+            return;
+        }
+
+        try {
+            // Prepare dynamic template variables
+            Context context = new Context();
+            context.setVariable("subject", subject);
+            context.setVariable("body", body);
+
+            // Render the HTML template
+            String html = templateEngine.process(
+                    "water-alert",
+                    context
+            );
+
+            log.debug("HTML email template rendered successfully");
+
+            // Create HTML email
+            MimeMessage message = sender.createMimeMessage();
+
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message,
+                    false,
+                    StandardCharsets.UTF_8.name()
+            );
+
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            sender.send(message);
+
+            log.info("Email sent successfully to {}", to);
+
+        } catch (Exception e) {
+            log.error("Could not send email to {}", to, e);
+        }
     }
 
-    try {
-        Context context = new Context();
-        context.setVariable("subject", subject);
-        context.setVariable("body", body);
 
-        String html = templateEngine.process(
-                "email/water-alert",
-                context
-        );
-
-        MimeMessage message = sender.createMimeMessage();
-
-        MimeMessageHelper helper = new MimeMessageHelper(
-                message,
-                false,
-                StandardCharsets.UTF_8.name()
-        );
-
-        helper.setFrom(from);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(html, true);
-
-        sender.send(message);
-
-    } catch (Exception e) {
-        log.warn(
-                "Could not send email to {}: {}",
-                to,
-                e.getMessage()
-        );
-    }
-}
 
 
     public void sendWaterUsageAlert(
