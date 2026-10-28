@@ -1,11 +1,19 @@
 package com.smartwater.service;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import jakarta.mail.internet.MimeMessage;
 
 @Service
 @Slf4j
@@ -13,23 +21,55 @@ public class EmailService {
     private final JavaMailSender sender;
     private final boolean enabled;
     private final String from;
-
+   private final SpringTemplateEngine templateEngine;
     public EmailService(JavaMailSender sender, @Value("${app.mail.enabled}") boolean enabled,
                         @Value("${app.mail.from}") String from) {
         this.sender = sender; this.enabled = enabled; this.from = from;
+        this.templateEngine = new SpringTemplateEngine();
     }
 
-    /** Best-effort delivery: mail problems must never break billing or alert flows. */
-    public void send(String to, String subject, String body) {
-        if (!enabled) { log.info("[mail disabled] to={} subject={}", to, subject); return; }
-        try {
-            SimpleMailMessage m = new SimpleMailMessage();
-            m.setFrom(from); m.setTo(to); m.setSubject(subject); m.setText(body);
-            sender.send(m);
-        } catch (Exception e) {
-            log.warn("Could not send email to {}: {}", to, e.getMessage());
-        }
+   
+public void send(String to, String subject, String body) {
+
+    if (!enabled) {
+        log.info("[mail disabled] to={} subject={}", to, subject);
+        return;
     }
+
+    try {
+        Context context = new Context();
+        context.setVariable("subject", subject);
+        context.setVariable("body", body);
+
+        String html = templateEngine.process(
+                "email/water-alert",
+                context
+        );
+
+        MimeMessage message = sender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(
+                message,
+                false,
+                StandardCharsets.UTF_8.name()
+        );
+
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setText(html, true);
+
+        sender.send(message);
+
+    } catch (Exception e) {
+        log.warn(
+                "Could not send email to {}: {}",
+                to,
+                e.getMessage()
+        );
+    }
+}
+
 
     public void sendWaterUsageAlert(
             String recipient,

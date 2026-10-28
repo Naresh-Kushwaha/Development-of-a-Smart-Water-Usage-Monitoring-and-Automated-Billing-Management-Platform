@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${subject}">Notification</title>
+</head>
+<body style="margin: 0; padding: 24px;
+             font-family: Arial, sans-serif;
+             background-color: #f4f6f8;">
+
+    <div style="max-width: 600px; margin: auto;
+                background: #ffffff; padding: 24px;
+                border-radius: 10px;">
+
+        <h2 style="color: #1976d2;"
+            th:text="${subject}">
+            Email Subject
+        </h2>
+
+        <div style="color: #333333; font-size: 15px;
+                    line-height: 1.7; white-space: pre-line;"
+             th:text="${body}">
+            Email body goes here.
+        </div>
+
+    </div>
+
+</body>
+</html>
