@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name : smartwater-frontend-deployment
+  labels:
+    app: smartwater-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smartwater-frontend
+  template:
+    metadata:
+      labels:
+        app: smartwater-frontend
+    spec:
+      containers:
+        - name: smartwater-frontend
+          image: nareshkushwaha/smartwater-frontend:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: BACKEND_URL
+              
+
+---              
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartwater-frontend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: smartwater-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+   
+

@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartwater-backend-deployment
+  labels:
+    app: smartwater-backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: smartwater-backend
+  template:
+    metadata:
+      labels:
+        app: smartwater-backend
+    spec:
+      containers:
+        - name: smartwater-backend
+          image: nareshkushwaha/smartwater-backend:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: DB_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: DB_URL
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: DB_PASSWORD
+            - name: MAIL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: MAIL_HOST
+
+            - name: MAIL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: MAIL_PORT
+            - name: JWT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: JWT_SECRET
+            - name: SEED_DEMO
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: SEED_DEMO
+            - name: CORS_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: CORS_ORIGINS
+              
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smartwater-backend-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: smartwater-backend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
+          
+

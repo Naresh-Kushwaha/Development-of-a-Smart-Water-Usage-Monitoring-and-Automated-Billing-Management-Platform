@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smartwater-config
+data:
+  DB_URL: "jdbc:postgresql://ep-rapid-dream-a1tbrsdg-pooler.ap-southeast-1.aws.neon.tech/smartwater"
+  DB_USER: "neondb_owner"
+  DB_PASSWORD: "npg_E0SotljngC7B"
+  MAIL_HOST: "mailhog"
+  MAIL_PORT: "1025"
+  JWT_SECRET: "5gkgwatOMD7OO8-pOTGU3IRPREHH8urijpR2R6hS6Tinh2oE00T0-LFu1D0FU2xw"
+  SEED_DEMO: "true" 
+  CORS_ORIGINS: "http://aeaa2930fe2a04a06ae593a9c309988a-379508353.ap-south-1.elb.amazonaws.com"
+  BACKEND_URL: "http://smartwater-backend-service"
+     

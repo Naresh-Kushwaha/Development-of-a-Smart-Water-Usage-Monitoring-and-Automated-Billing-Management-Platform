@@ -30,7 +30,7 @@ app:
   mail:
     enabled: ${MAIL_ENABLED:true}
     from: ${MAIL_USER:nn9619807@gmail.com}
-  alerts.cron: ${ALERT_CRON:0 0 7 * * *}
+  alerts.cron: ${ALERT_CRON:0 12 * * *}
   seed-demo: ${SEED_DEMO:true}
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}
 springdoc:
