@@ -3,9 +3,9 @@ server:
 spring:
   application.name: smart-water-platform
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/smartwater}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASSWORD:admin}
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate.ddl-auto: none
     open-in-view: false
@@ -14,24 +14,24 @@ spring:
   servlet:
     multipart.max-file-size: 5MB
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USER:nn9619807@gmail.com}
-    password: ${MAIL_PASSWORD:vcpg pvco qypa ogge}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USER}
+    password: ${MAIL_PASSWORD}
     properties.mail.smtp.auth: ${MAIL_AUTH:true}
     properties.mail.smtp.starttls.enable: ${MAIL_TLS:true}
-    properties.mail.smtp.connectiontimeout: 10000
-    properties.mail.smtp.timeout: 10000
+    properties.mail.smtp.connectiontimeout: 3000
+    properties.mail.smtp.timeout: 3000
 app:
   jwt:
-    secret: ${JWT_SECRET:5gkgwatOMD7OO8-pOTGU3IRPREHH8urijpR2R6hS6Tinh2oE00T0-LFu1D0FU2xw}
+    secret: ${JWT_SECRET}
     expiration-minutes: 720
-  cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+  cors-origins: ${CORS_ORIGINS}
   mail:
     enabled: ${MAIL_ENABLED:true}
-    from: ${MAIL_USER:nn9619807@gmail.com}
-  alerts.cron: ${ALERT_CRON:0 12 * * *}
-  seed-demo: ${SEED_DEMO:true}
+    from: ${MAIL_USER}
+  alerts.cron: ${ALERT_CRON}
+  seed-demo: ${SEED_DEMO}
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}
 springdoc:
   swagger-ui.path: /swagger-ui.html
