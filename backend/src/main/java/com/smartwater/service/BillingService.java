@@ -6,7 +6,9 @@ import com.smartwater.domain.Enums.*;
 import com.smartwater.repo.*;
 import com.smartwater.web.ApiException;
 import com.smartwater.web.Dtos.*;
+import com.smartwater.events.DomainEvents;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +32,7 @@ public class BillingService {
     private final InvoiceRepository invoices;
     private final UserRepository users;
     private final NotificationRepository notifications;
-    private final EmailService email;
+    private final DomainEvents events;
 
     public record Draft(Household household, BigDecimal consumptionKl, BigDecimal base, BigDecimal shared) {
         public BigDecimal total() { return base.add(shared); }
@@ -43,6 +45,7 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public TariffPlan updateTariff(Long apartmentId, TariffDto d) {
         TariffPlan t = tariffs.findByApartmentId(apartmentId).orElseGet(() -> {
             TariffPlan n = new TariffPlan();
@@ -57,6 +60,7 @@ public class BillingService {
 
     // ---------- bulk purchases ----------
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public BulkPurchase addPurchase(Long apartmentId, PurchaseReq r) {
         BulkPurchase p = new BulkPurchase();
         p.setApartment(apartments.getReferenceById(apartmentId));
@@ -66,12 +70,14 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public void deletePurchase(Long apartmentId, Long id) {
         purchases.delete(purchases.findByIdAndApartmentId(id, apartmentId).orElseThrow(() -> ApiException.notFound("Purchase")));
     }
 
     // ---------- cycle lifecycle: OPEN -> FINALIZED -> ARCHIVED ----------
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public BillingCycle open(Long apartmentId, CycleReq r) {
         if (r.endDate().isBefore(r.startDate())) throw ApiException.bad("End date must not be before start date");
         boolean overlap = cycles.findByApartmentIdOrderByStartDateDesc(apartmentId).stream()
@@ -89,6 +95,7 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public List<Invoice> finalizeCycle(Long apartmentId, Long cycleId) {
         BillingCycle c = cycle(apartmentId, cycleId);
         if (c.getStatus() != CycleStatus.OPEN) throw ApiException.conflict("Only an OPEN cycle can be finalized");
@@ -108,6 +115,7 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public BillingCycle archive(Long apartmentId, Long cycleId) {
         BillingCycle c = cycle(apartmentId, cycleId);
         if (c.getStatus() != CycleStatus.FINALIZED) throw ApiException.conflict("Only a FINALIZED cycle can be archived");
@@ -116,6 +124,7 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public Invoice adjust(Long apartmentId, Long invoiceId, AdjustmentReq r) {
         Invoice i = invoice(apartmentId, invoiceId);
         if (i.getBillingCycle().getStatus() == CycleStatus.OPEN) throw ApiException.conflict("Cycle is not finalized");
@@ -125,6 +134,7 @@ public class BillingService {
     }
 
     @Transactional
+    @CacheEvict(cacheNames = {"dashboard", "compare"}, allEntries = true)
     public Invoice markPaid(Long apartmentId, Long invoiceId) {
         Invoice i = invoice(apartmentId, invoiceId);
         i.setStatus(InvoiceStatus.PAID);
@@ -193,7 +203,7 @@ public class BillingService {
             Notification n = new Notification();
             n.setUser(u); n.setType(NotificationType.BILL); n.setMessage(msg);
             notifications.save(n);
-            email.send(u.getEmail(), "Water bill ready - " + i.getBillingCycle().getLabel(),
+            events.email(u.getEmail(), "Water bill ready - " + i.getBillingCycle().getLabel(),
                     "Hello " + u.getFullName() + ",\n\n" + msg + "\nLog in to view the itemised invoice and download the PDF.\n");
         }
     }

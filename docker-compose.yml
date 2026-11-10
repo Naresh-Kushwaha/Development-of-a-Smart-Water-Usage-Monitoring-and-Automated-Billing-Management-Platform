@@ -1,7 +1,46 @@
 services:
   
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  kafka:                       # single-node KRaft broker; needs ~1 GB RAM (use at least a t3.medium)
+    image: apache/kafka:3.8.0
+    restart: unless-stopped
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+  
   backend:
-    image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-backend:latest
+    build: ./backend
+    depends_on:
+      
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       DB_URL: ${DB_URL}
       DB_USER: ${DB_USER}
@@ -9,15 +48,26 @@ services:
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USER: ${MAIL_USER}
-      MAIL_PASSWORD: ${MAIL_PASSWORD} 
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
       JWT_SECRET: ${JWT_SECRET:-change-me-please-use-a-long-random-secret-of-32+bytes}
       SEED_DEMO: true
       CORS_ORIGINS: ${CORS_ORIGINS}
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
+      REDIS_ENABLED: "true"
+      REDIS_HOST: redis
+      KAFKA_ENABLED: "true"
+      KAFKA_BOOTSTRAP: kafka:9092
+      ALERT_CRON: ${ALERT_CRON}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+
 
     ports: ["8080:8080"]
 
   frontend:
-    image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
+    build: ./frontend
+    # image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
     depends_on: [backend]
     ports: ["3000:80"]
     environment:

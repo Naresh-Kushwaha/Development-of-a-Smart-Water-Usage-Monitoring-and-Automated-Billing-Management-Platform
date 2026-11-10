@@ -21,6 +21,7 @@ public final class Dtos {
     public record UserRes(Long id, String email, String fullName, String role, String apartmentName,
                           String apartmentCode, Long householdId, String unitNumber) {}
     public record AuthRes(String token, UserRes user) {}
+    public record OAuthCompleteReq(@NotBlank String ticket, @NotBlank String apartmentCode, @NotBlank String unitNumber) {}
 
     // ---- households ----
     public record HouseholdReq(@NotBlank String unitNumber, @NotNull @Positive BigDecimal areaSqft,

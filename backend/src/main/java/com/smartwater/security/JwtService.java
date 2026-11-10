@@ -1,6 +1,7 @@
 package com.smartwater.security;
 
 import com.smartwater.domain.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -24,6 +26,7 @@ public class JwtService {
     public String generate(User user) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())          // jti: lets us revoke one token on logout
                 .subject(user.getEmail())
                 .claim("role", user.getRole().name())
                 .issuedAt(new Date(now))
@@ -32,7 +35,12 @@ public class JwtService {
                 .compact();
     }
 
+    /** Verifies signature and expiry; throws a JwtException when the token is not valid. */
+    public Claims parse(String token) {
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+    }
+
     public String subject(String token) {
-        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload().getSubject();
+        return parse(token).getSubject();
     }
 }

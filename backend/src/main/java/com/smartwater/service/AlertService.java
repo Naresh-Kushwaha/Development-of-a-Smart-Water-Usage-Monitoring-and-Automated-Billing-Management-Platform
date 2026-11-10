@@ -4,14 +4,18 @@ import com.smartwater.billing.BillingCalc;
 import com.smartwater.domain.*;
 import com.smartwater.domain.Enums.*;
 import com.smartwater.repo.*;
+import com.smartwater.events.DomainEvents;
+import com.smartwater.store.KeyValueStore;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -31,18 +35,21 @@ public class AlertService {
     private final TariffRepository tariffs;
     private final UserRepository users;
     private final NotificationRepository notifications;
-    private final EmailService email;
+    private final DomainEvents events;
+    private final KeyValueStore store;
 
     public record Report(int overuse, int anomalies) {}
 
     /** Runs daily (configurable via app.alerts.cron) for every apartment. */
     @Scheduled(cron = "${app.alerts.cron}")
     public void scheduledRun() {
+        // With several backend instances every one fires this cron; the first to take the Redis lock does the work.
+        if (!store.setIfAbsent("lock:alerts:" + LocalDate.now(), Duration.ofHours(6))) {
+            log.info("Alert run already handled by another instance");
+            return;
+        }
         for (Apartment a : apartments.findAll()) {
-            try { 
-                Report r = check(a.getId());
-                log.info("Alert run for {}: {}", a.getName(), r); 
-            }
+            try { Report r = check(a.getId()); log.info("Alert run for {}: {}", a.getName(), r); }
             catch (Exception e) { log.error("Alert run failed for apartment {}", a.getId(), e); }
         }
     }
@@ -51,7 +58,8 @@ public class AlertService {
      * 1) OVERUSE: month-to-date usage above the apartment's configurable threshold (once per month per resident).
      * 2) LEAK: latest daily reading more than 2 sigma above the household's own recent average.
      */
-    @Transactional
+    // REQUIRES_NEW: also called right after another transaction committed (Kafka consumer / after-commit listener)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Report check(Long apartmentId) {
         TariffPlan tariff = tariffs.findByApartmentId(apartmentId).orElse(null);
         if (tariff == null) return new Report(0, 0);
@@ -74,7 +82,7 @@ public class AlertService {
                 for (User u : residents) {
                     if (notifyOnce(u, NotificationType.OVERUSE, msg, monthStart)) {
                         over++;
-                        email.send(u.getEmail(), "Water overuse alert - unit " + h.getUnitNumber(),
+                        events.email(u.getEmail(), "Water overuse alert - unit " + h.getUnitNumber(),
                                 msg + "\n\nTips to cut back:\n- " + String.join("\n- ", Tips.daily(3, today.getDayOfYear())));
                     }
                 }
@@ -93,7 +101,7 @@ public class AlertService {
                             h.getUnitNumber(), latest.getLitres(), latest.getReadingDate(), BillingCalc.mean(baseline));
                     for (User u : residents) {
                         if (notifyOnce(u, NotificationType.LEAK, detail, null))
-                            email.send(u.getEmail(), "Possible water leak - unit " + h.getUnitNumber(),
+                            events.email(u.getEmail(), "Possible water leak - unit " + h.getUnitNumber(),
                                     detail + "\n\nCheck taps, toilet cisterns and pipes. If usage stays high, contact your apartment admin.");
                     }
                     for (User a : admins) if (notifyOnce(a, NotificationType.LEAK, detail, null)) newAdminLines.add(detail);
@@ -102,7 +110,7 @@ public class AlertService {
         }
         if (!newAdminLines.isEmpty()) {
             String body = "Anomaly report:\n\n- " + String.join("\n- ", newAdminLines.stream().distinct().toList());
-            for (User a : admins) email.send(a.getEmail(), "Anomaly detection report", body);
+            for (User a : admins) events.email(a.getEmail(), "Anomaly detection report", body);
         }
         return new Report(over, anomalies);
     }

@@ -22,6 +22,34 @@ spring:
     properties.mail.smtp.starttls.enable: ${MAIL_TLS:true}
     properties.mail.smtp.connectiontimeout: 3000
     properties.mail.smtp.timeout: 3000
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 500ms            # a dead Redis must not stall requests
+      connect-timeout: 500ms
+      repositories.enabled: false
+  # ---- Kafka ----
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:29092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 3000          # fail fast (and fall back) if the broker is unreachable
+        request.timeout.ms: 5000
+        delivery.timeout.ms: 10000
+    consumer:
+      group-id: smartwater
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: com.smartwater.events
+
 app:
   jwt:
     secret: ${JWT_SECRET}
@@ -33,5 +61,14 @@ app:
   alerts.cron: ${ALERT_CRON}
   seed-demo: ${SEED_DEMO}
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}
+  public-url: ${PUBLIC_URL:}
+  redis.enabled: ${REDIS_ENABLED:false}      # cache, JWT revocation, rate limit, scheduler lock, sign-up tickets
+  kafka.enabled: ${KAFKA_ENABLED:false}      # async email + usage events (false = handled in-process)
+  kafka.replicas: ${KAFKA_REPLICAS:1}
+  rate-limit.auth-per-minute: ${AUTH_RATE_LIMIT:20}
+  oauth2.google:
+    client-id: ${GOOGLE_CLIENT_ID:}          # empty = Google login is off
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+
 springdoc:
   swagger-ui.path: /swagger-ui.html

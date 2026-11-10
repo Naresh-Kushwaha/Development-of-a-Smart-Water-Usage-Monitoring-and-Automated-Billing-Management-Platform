@@ -7,6 +7,7 @@ import com.smartwater.web.ApiException;
 import com.smartwater.web.Dtos.*;
 import com.smartwater.web.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class DashboardService {
     private final HouseholdRepository households;
     private final NotificationRepository notifications;
 
+    @Cacheable(cacheNames = "dashboard", key = "#u.id")      // Redis, 60 s; cleared on usage/billing changes
     public DashboardRes resident(User u) {
         Household h = requireHousehold(u);
         Long aid = u.getApartment().getId();
@@ -58,6 +60,7 @@ public class DashboardService {
     }
 
     /** Peer benchmarking over the last 30 days: me vs apartment average vs similar-sized (+/-20% area) households. */
+    @Cacheable(cacheNames = "compare", key = "#u.id")        // Redis, 5 min
     public CompareRes compare(User u) {
         Household me = requireHousehold(u);
         Long aid = u.getApartment().getId();

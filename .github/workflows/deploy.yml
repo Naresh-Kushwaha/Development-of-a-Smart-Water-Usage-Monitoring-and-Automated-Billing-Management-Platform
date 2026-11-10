@@ -67,11 +67,26 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
           DB_USER: ${{ secrets.DB_USER }}
           DB_URL: ${{ secrets.DB_URL }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MAIL_HOST: ${{ secrets.MAIL_HOST }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USER: ${{ secrets.MAIL_USER }}
+          ALERT_CRON: ${{ secrets.ALERT_CRON }}
+          REDIS_ENABLED: ${{ secrets.REDIS_ENABLED }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          KAFKA_ENABLED : ${{ secrets.KAFKA_ENABLED }}
+          KAFKA_BOOTSTRAP: ${{ secrets.KAFKA_BOOTSTRAP }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+
+
+
+
+
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -89,6 +104,17 @@ jobs:
               "DB_URL=$DB_URL" \
               "JWT_SECRET=$JWT_SECRET" \
               "CORS_ORIGINS=$CORS_ORIGINS" \
+              "MAIL_HOST=$MAIL_HOST" \
+              "MAIL_PORT=$MAIL_PORT" \
+              "MAIL_USER=$MAIL_USER" \
+              "MAIL_PASSWORD=$MAIL_PASSWORD" \
+              "ALERT_CRON=$ALERT_CRON" \
+              "REDIS_ENABLED=$REDIS_ENABLED" \
+              "REDIS_HOST=$REDIS_HOST" \
+              "KAFKA_ENABLED=$KAFKA_ENABLED" \
+              "KAFKA_BOOTSTRAP=$KAFKA_BOOTSTRAP" \
+              "GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID" \
+              "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" \
               "SEED_DEMO=false" > .env
 
             # Pull the latest application images

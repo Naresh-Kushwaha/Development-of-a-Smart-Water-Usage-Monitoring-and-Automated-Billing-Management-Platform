@@ -3,6 +3,12 @@ kind: ConfigMap
 metadata:
   name: smartwater-config
 data:
+  REDIS_ENABLED: "true"
+  REDIS_HOST: "redis"
+  KAFKA_ENABLED: "true"
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  MAIL_ENABLED: "true"
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
   DB_URL: "jdbc:postgresql://ep-rapid-dream-a1tbrsdg-pooler.ap-southeast-1.aws.neon.tech/smartwater"
   DB_USER: "neondb_owner"
   DB_PASSWORD: "npg_E0SotljngC7B"
