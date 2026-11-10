@@ -5,7 +5,7 @@ metadata:
   labels:
     app: smartwater-backend
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: smartwater-backend
@@ -46,6 +46,16 @@ spec:
                 configMapKeyRef:
                   name: smartwater-config
                   key: MAIL_PORT
+            - name: MAIL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: MAIL_USER
+            - name: MAIL_PASSWORD
+              valueFrom:  
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: MAIL_PASSWORD
             - name: JWT_SECRET
               valueFrom:
                 configMapKeyRef:
@@ -61,7 +71,63 @@ spec:
                 configMapKeyRef:
                   name: smartwater-config
                   key: CORS_ORIGINS
-              
+            - name: BACKEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: BACKEND_URL
+            - name: REDIS_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: REDIS_ENABLED
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: REDIS_HOST
+                  
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: REDIS_PORT
+            - name: KAFKA_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: KAFKA_ENABLED
+            - name: KAFKA_BOOTSTRAP
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: KAFKA_BOOTSTRAP
+            - name: MAIL_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: MAIL_ENABLED 
+            - name: PUBLIC_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: PUBLIC_URL
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: GOOGLE_CLIENT_ID
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: GOOGLE_CLIENT_SECRET
+            - name: ALERT_CRON
+              valueFrom:
+                configMapKeyRef:
+                  name: smartwater-config
+                  key: ALERT_CRON
+
 
 
 ---

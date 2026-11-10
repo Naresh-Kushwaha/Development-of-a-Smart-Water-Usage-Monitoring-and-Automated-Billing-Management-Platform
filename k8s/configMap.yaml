@@ -3,12 +3,6 @@ kind: ConfigMap
 metadata:
   name: smartwater-config
 data:
-  REDIS_ENABLED: "true"
-  REDIS_HOST: "redis"
-  KAFKA_ENABLED: "true"
-  KAFKA_BOOTSTRAP: "kafka:9092"
-  MAIL_ENABLED: "true"
-  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
   DB_URL: "jdbc:postgresql://ep-rapid-dream-a1tbrsdg-pooler.ap-southeast-1.aws.neon.tech/smartwater"
   DB_USER: "neondb_owner"
   DB_PASSWORD: ""
@@ -18,6 +12,18 @@ data:
   MAIL_PASSWORD: ""
   JWT_SECRET: "5gkgwatOMD7OO8-pOTGU3IRPREHH8urijpR2R6hS6Tinh2oE00T0-LFu1D0FU2xw"
   SEED_DEMO: "true" 
-  CORS_ORIGINS: ""
-  BACKEND_URL: ""
+  CORS_ORIGINS: "http://a1b9c476051f441099800df1c621f472-2025654603.ap-south-1.elb.amazonaws.com"
+  BACKEND_URL: "http://smartwater-backend-service:8080"
+  REDIS_ENABLED: "true"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  KAFKA_ENABLED: "true"
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  MAIL_ENABLED: "true"
+  PUBLIC_URL: "http://a1b9c476051f441099800df1c621f472-2025654603.ap-south-1.elb.amazonaws.com"
+  GOOGLE_CLIENT_ID: ""
+  GOOGLE_CLIENT_SECRET: ""
+  JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=70"
+  ALERT_CRON: "0 0 12 * * *"
+  
      
