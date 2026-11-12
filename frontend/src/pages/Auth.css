@@ -684,3 +684,40 @@
     transition-duration: .01ms !important;
   }
 }
+
+/* Water animation in branding section */
+.auth-water-animation {
+  width: 180px;
+  height: 150px;
+  margin: 12px auto 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.25));
+}
+
+/* Animated loading inside submit button */
+.auth-loading-lottie {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+/* Keep button content aligned */
+.auth-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .auth-water-animation {
+    width: 120px;
+    height: 110px;
+    margin: 8px auto;
+  }
+}

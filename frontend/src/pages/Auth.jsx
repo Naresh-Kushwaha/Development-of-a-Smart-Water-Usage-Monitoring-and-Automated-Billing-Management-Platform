@@ -1,6 +1,8 @@
 
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+
 import api, { errMsg } from '../api.js';
 import { useAuth } from '../auth.jsx';
 import { Field, Msg } from '../components/ui.jsx';
@@ -14,12 +16,45 @@ const MODES = {
 
 function GoogleIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/>
-      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.7 7.18l7.19 5.59c4.2-3.88 7.55-9.58 7.55-17.24Z"/>
-      <path fill="#FBBC05" d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.78-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z"/>
-      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.91-5.79l-7.19-5.59c-1.99 1.33-4.54 2.12-8.72 2.12-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/>
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 48 48"
+      aria-hidden="true"
+    >
+      <path
+        fill="#EA4335"
+        d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"
+      />
+      <path
+        fill="#4285F4"
+        d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.7 7.18l7.19 5.59c4.2-3.88 7.55-9.58 7.55-17.24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M10.53 28.59A14.4 14.4 0 0 1 9.75 24c0-1.59.27-3.13.78-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.52 2.56 10.78l7.97-6.19Z"
+      />
+      <path
+        fill="#34A853"
+        d="M24 48c6.48 0 11.93-2.13 15.91-5.79l-7.19-5.59c-1.99 1.33-4.54 2.12-8.72 2.12-6.26 0-11.57-4.22-13.46-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"
+      />
     </svg>
+  );
+}
+
+function WaterAnimation({ src, className = '', loop = true }) {
+  return (
+    <div className={className}>
+      <DotLottieReact
+        src={src}
+        loop={loop}
+        autoplay
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+      />
+    </div>
   );
 }
 
@@ -43,7 +78,10 @@ export default function Auth() {
   if (user) return <Navigate to="/" replace />;
 
   const set = (k) => (e) =>
-    setF((prev) => ({ ...prev, [k]: e.target.value }));
+    setF((prev) => ({
+      ...prev,
+      [k]: e.target.value,
+    }));
 
   const changeMode = (nextMode) => {
     setMode(nextMode);
@@ -65,6 +103,7 @@ export default function Auth() {
       }[mode];
 
       const { data } = await api.post(path, f);
+
       login(data);
       nav('/');
     } catch (ex) {
@@ -89,11 +128,18 @@ export default function Auth() {
 
           <div className="brand">
             <div className="brand-icon">💧</div>
-            <span>Aqua<span className="brand-highlight">Track</span></span>
-            <span className="brand-beta">SMART WATER</span>
+
+            <span>
+              Aqua<span className="brand-highlight">Track</span>
+            </span>
+
+            <span className="brand-beta">
+              SMART WATER
+            </span>
           </div>
 
           <div className="showcase-content">
+
             <span className="eyebrow">
               <span className="live-dot" />
               INTELLIGENT WATER MANAGEMENT
@@ -111,49 +157,70 @@ export default function Auth() {
               a smarter, more sustainable community.
             </p>
 
+            {/* LOTTIE WATER ANIMATION */}
+            <WaterAnimation
+              src="/animations/water-drop.lottie"
+              className="auth-water-animation"
+            />
+
             <div className="feature-list">
 
               <div className="feature-item">
                 <div className="feature-icon">📊</div>
+
                 <div>
                   <h3>Smart Analytics</h3>
-                  <p>Visualize daily usage and consumption trends.</p>
+                  <p>
+                    Visualize daily usage and consumption trends.
+                  </p>
                 </div>
               </div>
 
               <div className="feature-item">
                 <div className="feature-icon">🔔</div>
+
                 <div>
                   <h3>Real-time Alerts</h3>
-                  <p>Get notified about leaks and unusual usage.</p>
+                  <p>
+                    Get notified about leaks and unusual usage.
+                  </p>
                 </div>
               </div>
 
               <div className="feature-item">
                 <div className="feature-icon">💰</div>
+
                 <div>
                   <h3>Transparent Billing</h3>
-                  <p>Fair expense sharing and downloadable invoices.</p>
+                  <p>
+                    Fair expense sharing and downloadable invoices.
+                  </p>
                 </div>
               </div>
 
             </div>
 
             <div className="showcase-stats">
+
               <div>
                 <strong>24/7</strong>
                 <span>Monitoring</span>
               </div>
+
               <div className="stat-divider" />
+
               <div>
                 <strong>Smart</strong>
                 <span>Notifications</span>
               </div>
+
               <div className="stat-divider" />
+
               <div>
                 <strong>100%</strong>
                 <span>Transparency</span>
               </div>
+
             </div>
           </div>
 
@@ -161,6 +228,7 @@ export default function Auth() {
             <span>© 2026 AquaTrack</span>
             <span>Water smarter. Live better.</span>
           </div>
+
         </section>
 
         {/* RIGHT SIDE - AUTHENTICATION */}
@@ -170,12 +238,18 @@ export default function Auth() {
 
             <div className="mobile-brand">
               <div className="brand-icon">💧</div>
-              <span>Aqua<span className="brand-highlight">Track</span></span>
+
+              <span>
+                Aqua<span className="brand-highlight">Track</span>
+              </span>
             </div>
 
             <div className="auth-heading">
+
               <span className="auth-welcome">
-                {mode === 'login' ? 'WELCOME BACK' : 'GET STARTED'}
+                {mode === 'login'
+                  ? 'WELCOME BACK'
+                  : 'GET STARTED'}
               </span>
 
               <h2>
@@ -191,10 +265,12 @@ export default function Auth() {
                   ? 'Sign in to continue to your dashboard.'
                   : 'Fill in your details to get started.'}
               </p>
+
             </div>
 
-            {/* Authentication tabs */}
+            {/* AUTHENTICATION TABS */}
             <div className="auth-tabs">
+
               {Object.entries(MODES).map(([key, value]) => (
                 <button
                   type="button"
@@ -205,11 +281,13 @@ export default function Auth() {
                   {value}
                 </button>
               ))}
+
             </div>
 
-            {/* Google login */}
+            {/* GOOGLE LOGIN */}
             {google && mode !== 'admin' && (
               <div className="google-section">
+
                 <a
                   href="/api/oauth2/authorization/google"
                   className="google-login"
@@ -221,11 +299,14 @@ export default function Auth() {
                 <div className="auth-divider">
                   <span>OR CONTINUE WITH EMAIL</span>
                 </div>
+
               </div>
             )}
 
+            {/* AUTHENTICATION FORM */}
             <form onSubmit={submit} className="auth-fields">
 
+              {/* FULL NAME */}
               {mode !== 'login' && (
                 <Field label="Full name">
                   <input
@@ -237,6 +318,7 @@ export default function Auth() {
                 </Field>
               )}
 
+              {/* ADMIN FIELDS */}
               {mode === 'admin' && (
                 <>
                   <Field label="Apartment / society name">
@@ -256,6 +338,7 @@ export default function Auth() {
                 </>
               )}
 
+              {/* RESIDENT FIELDS */}
               {mode === 'resident' && (
                 <>
                   <Field
@@ -283,6 +366,7 @@ export default function Auth() {
                 </>
               )}
 
+              {/* EMAIL */}
               <Field label="Email address">
                 <input
                   type="email"
@@ -293,11 +377,13 @@ export default function Auth() {
                 />
               </Field>
 
+              {/* PASSWORD */}
               <Field
                 label="Password"
                 hint={mode === 'login' ? '' : 'Minimum 8 characters.'}
               >
                 <div className="password-wrapper">
+
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
@@ -314,14 +400,20 @@ export default function Auth() {
                   <button
                     type="button"
                     className="password-toggle"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    onClick={() =>
+                      setShowPassword((prev) => !prev)
+                    }
+                    aria-label={
+                      showPassword ? 'Hide password' : 'Show password'
+                    }
                   >
                     {showPassword ? '🙈' : '👁'}
                   </button>
+
                 </div>
               </Field>
 
+              {/* SECURE SIGN-IN */}
               {mode === 'login' && (
                 <div className="auth-options">
                   <span className="secure-label">
@@ -330,16 +422,30 @@ export default function Auth() {
                 </div>
               )}
 
+              {/* ERROR MESSAGE */}
               <Msg>{err}</Msg>
 
+              {/* SUBMIT BUTTON */}
               <button
                 className="auth-submit"
                 type="submit"
                 disabled={busy}
               >
+
                 {busy ? (
                   <>
-                    <span className="button-spinner" />
+                    <span className="auth-loading-lottie">
+                      <DotLottieReact
+                        src="/animations/water-loading.lottie"
+                        loop
+                        autoplay
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                        }}
+                      />
+                    </span>
+
                     Processing...
                   </>
                 ) : (
@@ -348,21 +454,29 @@ export default function Auth() {
                     <span className="submit-arrow">→</span>
                   </>
                 )}
+
               </button>
 
             </form>
 
+            {/* DEMO CREDENTIALS */}
             {mode === 'login' && (
               <div className="demo-credentials">
+
                 <span className="demo-icon">💡</span>
+
                 <div>
                   <strong>Explore with demo accounts</strong>
                   <p>Admin: admin@demo.com / Admin@123</p>
-                  <p>Resident: resident1@demo.com / Resident@123</p>
+                  <p>
+                    Resident: resident1@demo.com / Resident@123
+                  </p>
                 </div>
+
               </div>
             )}
 
+            {/* SECURITY FOOTER */}
             <div className="auth-security">
               <span>🛡️</span>
               Your information is protected with secure authentication.
@@ -371,6 +485,7 @@ export default function Auth() {
           </div>
 
         </section>
+
       </div>
     </main>
   );
