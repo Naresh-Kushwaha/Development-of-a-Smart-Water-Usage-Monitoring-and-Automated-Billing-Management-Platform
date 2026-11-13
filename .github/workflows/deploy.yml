@@ -75,6 +75,7 @@ jobs:
           MAIL_HOST: ${{ secrets.MAIL_HOST }}
           MAIL_PORT: ${{ secrets.MAIL_PORT }}
           MAIL_USER: ${{ secrets.MAIL_USER }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
           ALERT_CRON: ${{ secrets.ALERT_CRON }}
           REDIS_ENABLED: ${{ secrets.REDIS_ENABLED }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
