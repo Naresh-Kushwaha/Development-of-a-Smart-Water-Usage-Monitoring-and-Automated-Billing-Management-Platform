@@ -34,7 +34,8 @@ services:
       retries: 12
   
   backend:
-    build: ./backend
+    # build: ./backend
+    image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-backend:latest
     depends_on:
       
       redis:
@@ -68,8 +69,8 @@ services:
     ports: ["8080:8080"]
 
   frontend:
-    build: ./frontend
-    # image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
+    # build: ./frontend
+    image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
     depends_on: [backend]
     ports: ["5173:80"]
     environment:
