@@ -1,19 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api, { downloadInvoice, errMsg } from '../api.js';
+import { useAuth } from '../auth.jsx';
+import { payInvoice } from '../payments.js';
 import { inr, num, StatusPill, Msg } from './ui.jsx';
 
 export default function InvoiceTable({ invoices, admin = false, onChanged }) {
+  const { user } = useAuth();
   const [err, setErr] = useState('');
+  const [ok, setOk] = useState('');
+  const [payOn, setPayOn] = useState(false);     // is Razorpay configured on the server?
+  const [paying, setPaying] = useState(null);    // invoice id being paid
+
+  useEffect(() => {
+    if (admin) return;
+    api.get('/payments/config').then((r) => setPayOn(!!r.data.enabled)).catch(() => setPayOn(false));
+  }, [admin]);
+
   if (!invoices?.length) return <p className="muted">No invoices yet.</p>;
 
-  const run = async (fn) => {
-    setErr('');
-    try { await fn(); onChanged?.(); 
-
-    }
-     catch (e) { setErr(errMsg(e)); 
-      
-     }
+  const run = async (fn, success) => {
+    setErr(''); setOk('');
+    try { await fn(); if (success) setOk(success); onChanged?.(); } catch (e) { setErr(errMsg(e)); }
+  };
+  const pay = async (i) => {
+    setPaying(i.id);
+    await run(() => payInvoice(i.id, user), 'Payment received - thank you! A receipt has been emailed to you.');
+    setPaying(null);
   };
   const adjust = (i) => {
     const amount = prompt(`Adjustment for ${i.unitNumber} (use a negative number for a credit):`, i.adjustment ?? 0);
@@ -25,6 +37,7 @@ export default function InvoiceTable({ invoices, admin = false, onChanged }) {
   return (
     <>
       <Msg>{err}</Msg>
+      <Msg kind="ok">{ok}</Msg>
       <div className="table-wrap">
         <table>
           <thead>
@@ -47,6 +60,11 @@ export default function InvoiceTable({ invoices, admin = false, onChanged }) {
                 <td className="r"><strong>{inr(i.total)}</strong></td>
                 <td>{i.id ? <StatusPill status={i.status} /> : <span className="pill preview">PREVIEW</span>}</td>
                 <td className="actions">
+                  {!admin && payOn && i.id && i.status === 'UNPAID' && (
+                    <button className="link" disabled={paying === i.id} onClick={() => pay(i)}>
+                      {paying === i.id ? 'Opening…' : 'Pay now'}
+                    </button>
+                  )}
                   {i.id && <button className="link" onClick={() => run(() => downloadInvoice(i.id, `invoice-${i.unitNumber}-${i.cycleLabel}.pdf`))}>PDF</button>}
                   {admin && i.id && <button className="link" onClick={() => adjust(i)}>Adjust</button>}
                   {admin && i.id && i.status === 'UNPAID' && <button className="link" onClick={() => run(() => api.put(`/admin/invoices/${i.id}/paid`))}>Mark paid</button>}

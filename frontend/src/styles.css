@@ -1,4 +1,7 @@
-:root{--bg:#f1f5f9;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#0e7490;--brand2:#06b6d4;--bad:#dc2626;--warn:#d97706;--good:#16a34a}
+:root{--bg:#f1f5f9;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#0e7490;--brand2:#06b6d4;--bad:#dc2626;--warn:#d97706;--good:#16a34a;width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;}
 *{box-sizing:border-box}
 body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
 h2{margin:.2rem 0 1rem;font-size:1.5rem}h3{margin:0;font-size:1rem}
@@ -41,3 +44,36 @@ button.link{background:none;border:0;color:var(--brand);padding:0;font-weight:60
 .tabs{display:flex;gap:4px;background:#e2e8f0;padding:4px;border-radius:10px}.tabs button{flex:1;border:0;background:transparent;padding:.5rem;border-radius:8px;font-weight:600;color:var(--muted)}.tabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 2px rgb(0 0 0/.1)}
 .demo{display:block;margin-top:.3rem}
 @media(max-width:860px){.auth{grid-template-columns:1fr}.auth-art{padding:2rem}.side{position:fixed;z-index:10;transform:translateX(-100%);transition:transform .2s}.side.open{transform:none}.burger{display:block}main{padding:1rem}.shell{display:block}}
+
+/* =========================================
+   AUTH PAGE - OVERRIDE GLOBAL MAIN STYLES
+========================================= */
+
+main.auth-page {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  margin: 0;
+  padding: 24px 4%;
+
+  flex: none;
+}
+
+/* Make React root occupy the entire viewport */
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  overflow-x: hidden;
+}

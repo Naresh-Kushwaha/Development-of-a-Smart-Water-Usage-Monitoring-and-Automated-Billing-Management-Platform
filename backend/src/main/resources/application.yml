@@ -60,6 +60,11 @@ app:
     from: ${MAIL_USER}
   alerts.cron: ${ALERT_CRON}
   seed-demo: ${SEED_DEMO}
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:}                  # rzp_test_... while testing; empty = online payment is off
+    key-secret: ${RAZORPAY_KEY_SECRET:}          # backend only - never send this to the browser
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:}  # the secret you type when creating the webhook in the Razorpay dashboard
+    base-url: https://api.razorpay.com/v1
   payment-instructions: ${PAYMENT_INSTRUCTIONS:Pay at the apartment office or by bank transfer to the association account. Quote your unit number as the reference.}
   public-url: ${PUBLIC_URL:}
   redis.enabled: ${REDIS_ENABLED:false}      # cache, JWT revocation, rate limit, scheduler lock, sign-up tickets

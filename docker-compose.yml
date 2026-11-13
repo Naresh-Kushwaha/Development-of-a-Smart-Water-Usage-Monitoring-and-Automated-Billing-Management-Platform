@@ -61,7 +61,9 @@ services:
       PUBLIC_URL: ${PUBLIC_URL:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      RAZORPAY_WEBHOOK_SECRET: ${RAZORPAY_WEBHOOK_SECRET:-}
 
     ports: ["8080:8080"]
 
@@ -69,6 +71,6 @@ services:
     build: ./frontend
     # image: ${DOCKERHUB_USERNAME:?DOCKERHUB_USERNAME must be set}/smartwater-frontend:latest
     depends_on: [backend]
-    ports: ["3000:80"]
+    ports: ["5173:80"]
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://backend:8080}

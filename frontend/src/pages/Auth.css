@@ -1,44 +1,53 @@
 
 /* =========================================
-   AQUATRACK - MODERN AUTHENTICATION UI
+   AQUATRACK - FULL SCREEN AUTHENTICATION
 ========================================= */
 
 .auth-page {
   --aqua: #38bdf8;
   --aqua-dark: #0284c7;
   --navy: #071426;
-  --text: #172033;
-  --muted: #718096;
 
   position: relative;
+  width: 100%;
   min-height: 100vh;
-  overflow: hidden;
+  min-height: 100dvh;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 35px;
+
+  padding: 24px 4%;
+  margin: 0;
+
+  overflow-x: hidden;
+
   background:
     radial-gradient(ellipse at 10% 10%, #123c5b 0%, transparent 45%),
     radial-gradient(ellipse at 90% 90%, #102c4d 0%, transparent 45%),
     linear-gradient(135deg, #061323, #0a1c33 55%, #071426);
+
   font-family: Inter, "Segoe UI", Arial, sans-serif;
   isolation: isolate;
 }
 
+.auth-page,
 .auth-page * {
   box-sizing: border-box;
 }
 
-/* Background effects */
+/* Background decoration */
 
 .auth-grid-bg {
   position: absolute;
   inset: 0;
   z-index: -1;
   opacity: 0.13;
+
   background-image:
     linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
+
   background-size: 45px 45px;
   mask-image: linear-gradient(to bottom, black, transparent 90%);
 }
@@ -74,17 +83,26 @@
   to { transform: translateY(35px) scale(1.12); }
 }
 
-/* Main layout */
+/* =========================================
+   MAIN FULL-WIDTH LAYOUT
+========================================= */
 
 .auth-layout {
   position: relative;
+
   width: 100%;
-  max-width: 1200px;
-  min-height: 740px;
+  max-width: 1600px;
+  min-height: calc(100vh - 48px);
+
+  margin: 0 auto;
+
   display: grid;
-  grid-template-columns: 1fr 0.9fr;
+
+  grid-template-columns: minmax(0, 1.1fr) minmax(400px, 0.9fr);
+
   align-items: center;
-  gap: 60px;
+
+  gap: clamp(30px, 5vw, 100px);
 }
 
 /* =========================================
@@ -95,8 +113,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  width: 100%;
+  min-width: 0;
   min-height: 650px;
+
   padding: 20px 0;
+
   color: #fff;
 }
 
@@ -104,6 +127,7 @@
   display: flex;
   align-items: center;
   gap: 11px;
+
   font-size: 25px;
   font-weight: 800;
   letter-spacing: -1px;
@@ -112,11 +136,16 @@
 .brand-icon {
   width: 43px;
   height: 43px;
+
   display: grid;
   place-items: center;
+
   border-radius: 14px;
+
   background: linear-gradient(135deg, #38bdf8, #2563eb);
+
   box-shadow: 0 5px 25px rgba(14, 165, 233, .3);
+
   font-size: 23px;
 }
 
@@ -127,26 +156,33 @@
 .brand-beta {
   margin-left: 8px;
   padding: 5px 9px;
+
   border: 1px solid rgba(125, 211, 252, .3);
   border-radius: 5px;
+
   color: #7dd3fc;
   font-size: 9px;
   letter-spacing: 1.5px;
 }
 
 .showcase-content {
-  max-width: 520px;
-  margin: 35px 0;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px 0;
 }
 
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 9px;
+
   padding: 9px 13px;
+
   border: 1px solid rgba(125, 211, 252, .22);
   border-radius: 30px;
+
   background: rgba(14, 165, 233, .08);
+
   color: #7dd3fc;
   font-size: 10px;
   font-weight: 700;
@@ -156,17 +192,22 @@
 .live-dot {
   width: 7px;
   height: 7px;
+
   border-radius: 50%;
+
   background: #4ade80;
   box-shadow: 0 0 10px #4ade80;
 }
 
 .showcase-content h1 {
   margin: 28px 0 18px;
-  font-size: clamp(45px, 5.3vw, 68px);
+
+  font-size: clamp(45px, 5vw, 76px);
   line-height: 1.08;
+
   font-weight: 800;
   letter-spacing: -3px;
+
   color: #f8fafc;
 }
 
@@ -178,16 +219,34 @@
 }
 
 .showcase-description {
-  max-width: 430px;
+  max-width: 480px;
+
   color: #a8bdd1;
   font-size: 15px;
   line-height: 1.9;
 }
 
+/* Water animation */
+
+.auth-water-animation {
+  width: 180px;
+  height: 150px;
+
+  margin: 12px auto 18px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.25));
+}
+
+/* Features */
+
 .feature-list {
   display: grid;
   gap: 23px;
-  margin-top: 40px;
+  margin-top: 30px;
 }
 
 .feature-item {
@@ -199,12 +258,17 @@
 .feature-icon {
   width: 48px;
   height: 48px;
+
   flex-shrink: 0;
+
   display: grid;
   place-items: center;
+
   border: 1px solid rgba(125, 211, 252, .2);
   border-radius: 14px;
+
   background: rgba(56, 189, 248, .09);
+
   font-size: 21px;
 }
 
@@ -221,12 +285,16 @@
   line-height: 1.6;
 }
 
+/* Statistics */
+
 .showcase-stats {
   display: flex;
   align-items: center;
   gap: 28px;
-  margin-top: 45px;
-  padding-top: 28px;
+
+  margin-top: 35px;
+  padding-top: 25px;
+
   border-top: 1px solid rgba(255,255,255,.12);
 }
 
@@ -255,6 +323,8 @@
 .showcase-footer {
   display: flex;
   justify-content: space-between;
+  gap: 15px;
+
   color: #7690a8;
   font-size: 11px;
 }
@@ -265,19 +335,26 @@
 
 .auth-card-wrapper {
   width: 100%;
-  max-width: 490px;
-  justify-self: end;
+  max-width: 540px;
+  min-width: 0;
+
+  justify-self: center;
 }
 
 .auth-card {
   width: 100%;
-  padding: 42px;
+
+  padding: clamp(28px, 3vw, 46px);
+
   border: 1px solid rgba(255,255,255,.8);
   border-radius: 24px;
+
   background: rgba(255,255,255,.97);
+
   box-shadow:
     0 30px 90px rgba(0,0,0,.3),
     0 5px 20px rgba(14,165,233,.08);
+
   animation: cardAppear .65s ease-out;
 }
 
@@ -286,6 +363,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -327,8 +405,10 @@
 .auth-tabs {
   display: flex;
   gap: 4px;
+
   padding: 5px;
   margin-bottom: 23px;
+
   border-radius: 10px;
   background: #f1f5f9;
 }
@@ -336,13 +416,18 @@
 .auth-tabs button {
   flex: 1;
   min-width: 0;
+
   padding: 11px 5px;
+
   border: 0;
   border-radius: 7px;
+
   background: transparent;
+
   color: #64748b;
   font-size: 11px;
   font-weight: 700;
+
   cursor: pointer;
   transition: .25s ease;
 }
@@ -357,7 +442,7 @@
   box-shadow: 0 2px 8px rgba(15,23,42,.08);
 }
 
-/* Google sign in */
+/* Google login */
 
 .google-section {
   margin-bottom: 21px;
@@ -366,18 +451,23 @@
 .google-login {
   width: 100%;
   min-height: 49px;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
+
   border: 1px solid #dadce0;
   border-radius: 8px;
+
   background: #fff;
   color: #3c4043;
+
   text-decoration: none;
   font-family: Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
+
   transition: background .2s, box-shadow .2s, border-color .2s;
 }
 
@@ -399,7 +489,9 @@
   display: flex;
   align-items: center;
   gap: 13px;
+
   margin-top: 22px;
+
   color: #9ca3af;
   font-size: 9px;
   font-weight: 700;
@@ -423,7 +515,6 @@
   gap: 15px;
 }
 
-/* Style the existing Field component */
 .auth-card .auth-fields label {
   color: #334155;
   font-size: 12px;
@@ -433,14 +524,20 @@
 .auth-card .auth-fields input {
   width: 100%;
   min-height: 45px;
+
   padding: 12px 14px;
+
   border: 1px solid #dce3ec;
   border-radius: 9px;
+
   outline: none;
+
   background: #f9fbfd;
   color: #172033;
+
   font-family: inherit;
   font-size: 13px;
+
   transition: border-color .2s, box-shadow .2s, background .2s;
 }
 
@@ -471,10 +568,14 @@
   position: absolute;
   top: 50%;
   right: 12px;
+
   transform: translateY(-50%);
+
   padding: 5px;
+
   border: 0;
   background: transparent;
+
   cursor: pointer;
   font-size: 15px;
 }
@@ -496,20 +597,28 @@
 .auth-submit {
   width: 100%;
   min-height: 49px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
+
   margin-top: 4px;
   padding: 12px 18px;
+
   border: none;
   border-radius: 9px;
+
   background: linear-gradient(100deg, #0284c7, #2563eb);
   color: white;
+
   font-size: 13px;
   font-weight: 700;
+
   cursor: pointer;
+
   box-shadow: 0 7px 18px rgba(37,99,235,.2);
+
   transition: transform .2s, box-shadow .2s;
 }
 
@@ -532,29 +641,30 @@
   transform: translateX(4px);
 }
 
-.button-spinner {
-  width: 15px;
-  height: 15px;
-  border: 2px solid rgba(255,255,255,.4);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
+.auth-loading-lottie {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Demo account information */
+/* Demo credentials */
 
 .demo-credentials {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+
   margin-top: 22px;
   padding: 14px;
+
   border: 1px solid #dbeafe;
   border-radius: 10px;
+
   background: #eff6ff;
 }
 
@@ -583,48 +693,90 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+
   margin-top: 23px;
   padding-top: 18px;
+
   border-top: 1px solid #edf0f4;
+
   color: #8a96a6;
   font-size: 10px;
   text-align: center;
   line-height: 1.6;
 }
 
-/* Error message */
 .auth-card .auth-fields [role="alert"] {
   color: #dc2626;
   font-size: 12px;
 }
 
 /* =========================================
-   RESPONSIVE DESIGN
+   LARGE DESKTOP
 ========================================= */
 
-@media (max-width: 1000px) {
+@media (min-width: 1500px) {
   .auth-layout {
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    max-width: 1700px;
+    grid-template-columns: minmax(0, 1.15fr) minmax(480px, .85fr);
   }
 
-  .auth-card {
-    padding: 30px;
+  .auth-showcase {
+    padding-left: 20px;
   }
 
-  .showcase-content h1 {
-    font-size: 49px;
+  .auth-card-wrapper {
+    max-width: 560px;
   }
 }
 
-@media (max-width: 760px) {
+/* =========================================
+   LAPTOP / SMALL DESKTOP
+========================================= */
+
+@media (max-width: 1100px) and (min-width: 769px) {
   .auth-page {
-    padding: 20px 14px;
+    padding: 25px;
   }
 
   .auth-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, .95fr);
+    gap: 25px;
+  }
+
+  .auth-card {
+    padding: 28px;
+  }
+
+  .showcase-content h1 {
+    font-size: 48px;
+  }
+
+  .feature-list {
+    gap: 17px;
+  }
+}
+
+/* =========================================
+   TABLET AND MOBILE
+========================================= */
+
+@media (max-width: 768px) {
+  .auth-page {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    padding: 24px 14px;
+
+    align-items: center;
+  }
+
+  .auth-layout {
+    width: 100%;
     max-width: 480px;
+
     min-height: auto;
+
     display: block;
   }
 
@@ -633,10 +785,12 @@
   }
 
   .auth-card-wrapper {
+    width: 100%;
     max-width: 100%;
   }
 
   .auth-card {
+    width: 100%;
     padding: 30px 22px;
     border-radius: 18px;
   }
@@ -645,7 +799,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
+
     margin-bottom: 30px;
+
     color: #10243a;
     font-size: 22px;
     font-weight: 800;
@@ -659,7 +815,15 @@
   .auth-heading h2 {
     font-size: 25px;
   }
+
+  .auth-water-animation {
+    width: 120px;
+    height: 110px;
+    margin: 8px auto;
+  }
 }
+
+/* Small phones */
 
 @media (max-width: 380px) {
   .auth-card {
@@ -676,48 +840,13 @@
   }
 }
 
+/* Accessibility */
+
 @media (prefers-reduced-motion: reduce) {
   .auth-page *,
   .auth-page *::before,
   .auth-page *::after {
     animation-duration: .01ms !important;
     transition-duration: .01ms !important;
-  }
-}
-
-/* Water animation in branding section */
-.auth-water-animation {
-  width: 180px;
-  height: 150px;
-  margin: 12px auto 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  filter: drop-shadow(0 0 18px rgba(34, 211, 238, 0.25));
-}
-
-/* Animated loading inside submit button */
-.auth-loading-lottie {
-  display: inline-flex;
-  width: 34px;
-  height: 34px;
-  flex-shrink: 0;
-  vertical-align: middle;
-}
-
-/* Keep button content aligned */
-.auth-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-/* Mobile optimization */
-@media (max-width: 768px) {
-  .auth-water-animation {
-    width: 120px;
-    height: 110px;
-    margin: 8px auto;
   }
 }

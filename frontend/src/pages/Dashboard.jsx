@@ -368,7 +368,7 @@ export default function Dashboard() {
 
       {/* Invoice History */}
       <Card title="Invoice history">
-        <InvoiceTable invoices={data.invoices} />
+        <InvoiceTable invoices={data.invoices} onChanged={reload}/>
       </Card>
 
     </div>
