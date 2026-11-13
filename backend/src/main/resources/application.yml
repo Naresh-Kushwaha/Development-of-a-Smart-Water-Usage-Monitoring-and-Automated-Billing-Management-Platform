@@ -74,6 +74,12 @@ app:
   oauth2.google:
     client-id: ${GOOGLE_CLIENT_ID:}          # empty = Google login is off
     client-secret: ${GOOGLE_CLIENT_SECRET:}
+  chatbot:
+    api-key: ${ANTHROPIC_API_KEY:}               # empty = the assistant answers from its built-in FAQ only
+    model: ${CHATBOT_MODEL:claude-haiku-5-5}     # check Anthropic's docs for current model names and prices
+    base-url: https://api.anthropic.com
+    max-tokens: 600
+    per-minute: ${CHATBOT_PER_MINUTE:8}     
 
 springdoc:
   swagger-ui.path: /swagger-ui.html

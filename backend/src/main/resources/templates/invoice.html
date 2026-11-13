@@ -1,0 +1,285 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 25px;
+        }
+
+        body {
+            font-family: Helvetica, sans-serif;
+            color: #1e293b;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .header {
+            background-color: #075985;
+            color: white;
+            padding: 28px;
+        }
+
+        .brand {
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #bae6fd;
+            margin-top: 6px;
+        }
+
+        .invoice-heading {
+            font-size: 28px;
+            margin-top: 25px;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            color: #0e7490;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ecfeff;
+            color: #0e7490;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        .status {
+            padding: 7px 14px;
+            font-weight: bold;
+        }
+
+        .paid {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .unpaid {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .total-box {
+            background-color: #ecfeff;
+            margin-top: 25px;
+            padding: 22px;
+        }
+
+        .total-label {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .total-amount {
+            font-size: 29px;
+            font-weight: bold;
+            color: #0e7490;
+            margin-top: 8px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            background-color: #f1f5f9;
+            padding: 18px;
+            text-align: center;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+
+    <div class="brand">SMART WATER</div>
+
+    <div class="subtitle">
+        Smart Water Management Platform
+    </div>
+
+    <div class="invoice-heading">
+        WATER INVOICE
+    </div>
+
+    <p>
+        Invoice ID:
+        <strong th:text="${invoice.id}"></strong>
+    </p>
+
+    <p>
+        Billing Cycle:
+        <strong th:text="${invoice.billingCycle.label}"></strong>
+    </p>
+
+</div>
+
+<!-- HOUSEHOLD DETAILS -->
+<div class="section">
+
+    <div class="section-title">
+        HOUSEHOLD INFORMATION
+    </div>
+
+    <table>
+        <tr>
+            <td class="muted">Apartment</td>
+            <td th:text="${apartmentName}"></td>
+        </tr>
+
+        <tr>
+            <td class="muted">Unit Number</td>
+            <td th:text="${invoice.household.unitNumber}"></td>
+        </tr>
+
+        <tr>
+            <td class="muted">Invoice Date</td>
+            <td th:text="${#temporals.format(
+                invoice.createdAt.atZone(
+                    T(java.time.ZoneId).of('Asia/Kolkata')
+                ),
+                'dd MMM yyyy'
+            )}"></td>
+        </tr>
+
+        <tr>
+            <td class="muted">Payment Status</td>
+            <td>
+                <span class="status"
+                      th:classappend="${invoice.status.name() == 'PAID'}
+                      ? ' paid' : ' unpaid'"
+                      th:text="${invoice.status}">
+                </span>
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<!-- CONSUMPTION -->
+<div class="section">
+
+    <div class="section-title">
+        WATER CONSUMPTION
+    </div>
+
+    <table>
+        <tr>
+            <th>Description</th>
+            <th>Consumption</th>
+        </tr>
+
+        <tr>
+            <td>Water Used</td>
+            <td>
+                <strong th:text="${formattedConsumption}"></strong>
+                KL
+            </td>
+        </tr>
+    </table>
+
+</div>
+
+<!-- BILL BREAKDOWN -->
+<div class="section">
+
+    <div class="section-title">
+        BILL BREAKDOWN
+    </div>
+
+    <table>
+
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+        </tr>
+
+        <tr>
+            <td>Base Water Charges</td>
+            <td th:text="${formattedBaseCharge}"></td>
+        </tr>
+
+        <tr>
+            <td>Shared Water Charges</td>
+            <td th:text="${formattedSharedCharge}"></td>
+        </tr>
+
+        <tr>
+            <td>Adjustment</td>
+            <td th:text="${formattedAdjustment}"></td>
+        </tr>
+
+        <tr th:if="${invoice.adjustmentNote != null
+                    and !invoice.adjustmentNote.isEmpty()}">
+            <td colspan="2">
+                <span class="muted">Adjustment Note: </span>
+                <span th:text="${invoice.adjustmentNote}"></span>
+            </td>
+        </tr>
+
+    </table>
+
+</div>
+
+<!-- TOTAL -->
+<div class="total-box">
+
+    <div class="total-label">
+        TOTAL AMOUNT PAYABLE
+    </div>
+
+    <div class="total-amount"
+         th:text="${formattedTotal}">
+    </div>
+
+    <p class="muted">
+        Please complete your payment before the due date.
+    </p>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+
+    <strong>Thank you for saving water!</strong>
+
+    <p>
+        Smart Water Management Platform
+    </p>
+
+    <p>
+        Every drop counts. Save water, save the future.
+    </p>
+
+</div>
+
+</body>
+</html>

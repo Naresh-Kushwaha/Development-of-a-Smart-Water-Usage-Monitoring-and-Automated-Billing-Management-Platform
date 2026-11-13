@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Smart Water Notification</title>
+</head>
+
+<body style="
+    margin:0;
+    padding:0;
+    background-color:#f1f5f9;
+    font-family:Arial,Helvetica,sans-serif;
+">
+
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background-color:#f1f5f9;padding:35px 10px;">
+
+    <tr>
+        <td align="center">
+
+            <!-- MAIN CONTAINER -->
+            <table width="600" cellpadding="0" cellspacing="0"
+                   style="
+                       max-width:600px;
+                       width:100%;
+                       background:#ffffff;
+                       border-radius:12px;
+                       overflow:hidden;
+                   ">
+
+                <!-- HEADER -->
+                <tr>
+                    <td style="
+                        background-color:#075985;
+                        padding:35px 30px;
+                        text-align:center;
+                    ">
+
+                        <div style="
+                            color:#ffffff;
+                            font-size:28px;
+                            font-weight:bold;
+                            letter-spacing:2px;
+                        ">
+                            SMART WATER
+                        </div>
+
+                        <p style="
+                            color:#bae6fd;
+                            font-size:13px;
+                            margin-bottom:0;
+                        ">
+                            Smart Water Management Platform
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- CONTENT -->
+                <tr>
+                    <td style="padding:35px 30px;">
+
+                        <p style="
+                            color:#64748b;
+                            font-size:13px;
+                            margin-top:0;
+                        ">
+                            NOTIFICATION
+                        </p>
+
+                        <h1 style="
+                            color:#0f172a;
+                            font-size:24px;
+                            margin-top:8px;
+                            margin-bottom:20px;
+                        "
+                            th:text="${subject}">
+                            Notification Title
+                        </h1>
+
+                        <div style="
+                            background-color:#ecfeff;
+                            border-left:4px solid #0891b2;
+                            padding:20px;
+                            border-radius:5px;
+                            color:#334155;
+                            font-size:15px;
+                            line-height:1.8;
+                            white-space:pre-line;
+                        "
+                             th:text="${body}">
+                            Your notification message will appear here.
+                        </div>
+
+                        <!-- ACTION BUTTON -->
+                        <table cellpadding="0" cellspacing="0"
+                               style="margin-top:30px;">
+
+                            <tr>
+                                <td style="
+                                    background-color:#0891b2;
+                                    border-radius:6px;
+                                ">
+
+                                    <a th:href="${appUrl}"
+                                       style="
+                                           display:inline-block;
+                                           padding:14px 25px;
+                                           color:#ffffff;
+                                           text-decoration:none;
+                                           font-size:14px;
+                                           font-weight:bold;
+                                       ">
+                                        Visit Smart Water Platform
+                                    </a>
+
+                                </td>
+                            </tr>
+
+                        </table>
+
+                        <p style="
+                            margin-top:30px;
+                            color:#64748b;
+                            font-size:13px;
+                            line-height:1.6;
+                        ">
+                            Thank you for being part of our water
+                            conservation initiative.
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="
+                        background-color:#f8fafc;
+                        padding:25px;
+                        text-align:center;
+                    ">
+
+                        <p style="
+                            color:#0e7490;
+                            font-size:16px;
+                            font-weight:bold;
+                            margin:0 0 10px;
+                        ">
+                            Every Drop Counts!
+                        </p>
+
+                        <p style="
+                            color:#64748b;
+                            font-size:12px;
+                            line-height:1.6;
+                            margin:0;
+                        ">
+                            Smart Water Management Platform
+                            <br/>
+                            Save Water. Save Future.
+                        </p>
+
+                        <p style="
+                            color:#94a3b8;
+                            font-size:11px;
+                            margin-top:18px;
+                        ">
+                            This is an automated notification.
+                            Please do not reply to this email.
+                        </p>
+
+                    </td>
+                </tr>
+
+            </table>
+
+        </td>
+    </tr>
+
+</table>
+
+</body>
+</html>

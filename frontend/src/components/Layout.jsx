@@ -1,6 +1,7 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../auth.jsx';
+import ChatWidget from './ChatWidget.jsx';
 
 const resident = [
   ['/', 'Dashboard', '📊'],
@@ -47,6 +48,7 @@ export default function Layout() {
         <button className="burger" onClick={() => setOpen(!open)} aria-label="Toggle menu">☰</button>
         <Outlet />
       </main>
+      <ChatWidget />
     </div>
   );
 }
